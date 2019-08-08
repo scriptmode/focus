@@ -3,7 +3,7 @@ python: 2.7
 os:
   - linux
 #  - osx
-#  - windows
+  - windows
 #
 # This (filter_secrets) is generally unsafe, but we only run builds for master,
 # so it is acceptable. If we remove the branch restriction, remove this too.
@@ -28,3 +28,4 @@ script:
   - pyinstaller focus.py 
 after_script:
   - find dist build
+  - tar -cfz build.tar.gz dist build
