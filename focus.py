@@ -33,7 +33,7 @@ class Commander (object):
         if cmd == "":
             return
 
-        print ""
+        print("")
 
         hadOutput = False
         with serial.Serial (args.port, 9600, timeout = 1) as ser:
@@ -52,10 +52,10 @@ class Commander (object):
 
                 if resultLine:
                     hadOutput = True
-                    print "<", resultLine
+                    print("< %s" % resultLine)
 
         if hadOutput:
-            print ""
+            print("")
 
 parser = argparse.ArgumentParser(description="talk to the Kaleidoscope keyboard via serial to Focus Plugin")
 parser.add_argument('--port', default='/dev/ttyACM0')
@@ -76,7 +76,7 @@ while True:
     except EOFError:
         sys.exit (0)
     except Exception:
-        print "WARNING: Connection to serial lost, sleeping 10s..."
+        print("WARNING: Connection to serial lost, sleeping 10s...")
         time.sleep (10)
-        print "WARNING: Sleep over, resuming!"
+        print("WARNING: Sleep over, resuming!")
         pass

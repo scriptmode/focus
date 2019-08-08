@@ -1,18 +1,25 @@
 language: python
-python: 2.7
-os:
-  - linux
-#  - osx
-  - windows
+matrix:
+  include:
+    - name: "Python 3.7.1 on Xenial Linux"
+      python: 3.7           # this works for Linux but is ignored on macOS or Windows
+      dist: xenial          # required for Python >= 3.7
+    - name: "Python 3.7.3 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install python
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 #
 # This (filter_secrets) is generally unsafe, but we only run builds for master,
 # so it is acceptable. If we remove the branch restriction, remove this too.
 # If Windows builds on Travis are fixed, and work when secrets are in use,
 # remove this too.
 filter_secrets: false
-matrix:
-  allow_failures:
-    - os: windows
+#matrix:
+#  allow_failures:
+#    - os: windows
 #env:
 #  - YARN_GPG=no
 #if: branch = master OR tag IS present
@@ -23,7 +30,7 @@ matrix:
 #      - libudev-dev
 #cache: yarn
 install:
-  - pip install -r requirements.txt
+  - pip3 install -r requirements.txt
 script:
   - pyinstaller focus.py 
 after_script:
