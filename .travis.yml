@@ -1,0 +1,29 @@
+language: python
+os:
+  - linux
+#  - osx
+#  - windows
+#
+# This (filter_secrets) is generally unsafe, but we only run builds for master,
+# so it is acceptable. If we remove the branch restriction, remove this too.
+# If Windows builds on Travis are fixed, and work when secrets are in use,
+# remove this too.
+filter_secrets: false
+matrix:
+  allow_failures:
+    - os: windows
+#env:
+#  - YARN_GPG=no
+#if: branch = master OR tag IS present
+#dist: xenial
+#addons:
+#  apt:
+#    packages:
+#      - libudev-dev
+#cache: yarn
+install:
+  - pip install -r requirements.txt
+script:
+  - pyinstaller focus.py 
+after_script:
+  - find dist build
