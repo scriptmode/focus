@@ -16,11 +16,14 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import serial
+import serial.tools.list_ports
 import sys
 import time
 import os
 import atexit
 import argparse
+
+RAISE_VIDPID = '1209:2201'
 
 try:
     import readline
@@ -29,6 +32,7 @@ except ImportError:
 
 
 class Commander (object):
+
     def run (self):
         cmd = raw_input ("> ");
 
@@ -61,26 +65,35 @@ class Commander (object):
         if hadOutput:
             print("")
 
-parser = argparse.ArgumentParser(description="talk to the Kaleidoscope keyboard via serial to Focus Plugin")
-parser.add_argument('--port', default='/dev/ttyACM0')
-args = parser.parse_args()
+if __name__ == '__main__':
 
-commander = Commander ()
+    parser = argparse.ArgumentParser(description="talk to the Kaleidoscope keyboard via serial to Focus Plugin")
+    parser.add_argument('--port') # allow override
+    args = parser.parse_args()
 
-histfile = os.path.join (os.path.expanduser ("~"), ".kaleidoscope-commander.hist")
-try:
-    readline.read_history_file (histfile)
-except IOError:
-    pass
-atexit.register (readline.write_history_file, histfile)
+    # by default, find an attached raise
+    if not args.port:
+        ports = serial.tools.list_ports.grep(RAISE_VIDPID)
+        for port in ports:
+            print("found %s port on %s" % (port.usb_description(), port.device))
+            args.port = port.device
 
-while True:
+    commander = Commander ()
+
+    histfile = os.path.join (os.path.expanduser ("~"), ".kaleidoscope-commander.hist")
     try:
-        commander.run ()
-    except EOFError:
-        sys.exit (0)
-    except Exception:
-        print("WARNING: Connection to serial lost, sleeping 10s...")
-        time.sleep (10)
-        print("WARNING: Sleep over, resuming!")
+        readline.read_history_file (histfile)
+    except IOError:
         pass
+    atexit.register (readline.write_history_file, histfile)
+
+    while True:
+        try:
+            commander.run ()
+        except EOFError:
+            sys.exit (0)
+        except Exception:
+            print("WARNING: Connection to serial lost, sleeping 10s...")
+            time.sleep (10)
+            print("WARNING: Sleep over, resuming!")
+            pass
