@@ -12,12 +12,14 @@ matrix:
         - python -m pip install --upgrade pip
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 
-addons: 
-    artifacts:
-        debug: true
-        paths: 
-        - build
-        - dist
+# doesn't work
+#addons: 
+#    artifacts:
+#        debug: true
+#        paths: 
+#        - build
+#        - dist
+#
 #
 # This (filter_secrets) is generally unsafe, but we only run builds for master,
 # so it is acceptable. If we remove the branch restriction, remove this too.
@@ -42,3 +44,5 @@ script:
   - pyinstaller focus.py 
 after_script:
   - find dist build
+  - pip3 install s3cmd
+  - s3cmd --recursive --access_key $ARTIFACTS_KEY --secret_key $ARTIFACTS_SECRET put dist s3://dygma-chrysalis/focus/ -vv
