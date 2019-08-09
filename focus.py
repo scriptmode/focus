@@ -19,9 +19,14 @@ import serial
 import sys
 import time
 import os
-import readline
 import atexit
 import argparse
+
+try:
+    import readline
+except ImportError:
+    import pyreadline as readline
+
 
 class Commander (object):
     def run (self):
@@ -37,8 +42,7 @@ class Commander (object):
 
         hadOutput = False
         with serial.Serial (args.port, 9600, timeout = 1) as ser:
-            ser.write (cmd)
-            ser.write ("\n")
+            ser.write (cmd + "\n")
             while True:
                 resultLine = ser.readline ()
 
