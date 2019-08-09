@@ -41,7 +41,7 @@ filter_secrets: false
 install:
   - pip3 install -r requirements.txt
 script:
-  - pyinstaller focus.py 
+  - pyinstaller -F focus.py 
 after_script:
   - find dist build
   - pip3 install s3cmd
