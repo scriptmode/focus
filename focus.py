@@ -34,7 +34,7 @@ except ImportError:
 class Commander (object):
 
     def run (self):
-        cmd = raw_input ("> ");
+        cmd = input("> ")
 
         if cmd == "quit" or cmd == "exit":
             sys.exit (0)
@@ -46,9 +46,9 @@ class Commander (object):
 
         hadOutput = False
         with serial.Serial (args.port, 9600, timeout = 1) as ser:
-            ser.write (cmd + "\n")
+            ser.write (str.encode(cmd + "\n"))
             while True:
-                resultLine = ser.readline ()
+                resultLine = ser.readline().decode('utf-8')
 
                 if resultLine == "\r\n" or resultLine == "\n":
                     resultLine = " "
@@ -60,10 +60,11 @@ class Commander (object):
 
                 if resultLine:
                     hadOutput = True
-                    print("< %s" % resultLine)
+                    print(f"< {resultLine}")
 
         if hadOutput:
             print("")
+
 
 if __name__ == '__main__':
 
@@ -89,10 +90,11 @@ if __name__ == '__main__':
 
     while True:
         try:
-            commander.run ()
+            commander.run()
         except EOFError:
             sys.exit (0)
-        except Exception:
+        except Exception as e:
+            print(e)
             print("WARNING: Connection to serial lost, sleeping 10s...")
             time.sleep (10)
             print("WARNING: Sleep over, resuming!")
