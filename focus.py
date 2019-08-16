@@ -31,13 +31,16 @@ except ImportError:
     import pyreadline as readline
 
 
-class Commander (object):
+class Commander(object):
 
-    def run (self):
-        cmd = input("> ")
+    def run(self):
+        try:
+            cmd = raw_input("> ")
+        except NameError:
+            cmd = input("> ")
 
         if cmd == "quit" or cmd == "exit":
-            sys.exit (0)
+            sys.exit(0)
 
         if cmd == "":
             return
@@ -45,22 +48,22 @@ class Commander (object):
         print("")
 
         hadOutput = False
-        with serial.Serial (args.port, 9600, timeout = 1) as ser:
-            ser.write (str.encode(cmd + "\n"))
+        with serial.Serial(args.port, 9600, timeout = 1) as ser:
+            ser.write(str.encode(cmd + "\n"))
             while True:
                 resultLine = ser.readline().decode('utf-8')
 
                 if resultLine == "\r\n" or resultLine == "\n":
                     resultLine = " "
                 else:
-                    resultLine = resultLine.rstrip ()
+                    resultLine = resultLine.rstrip()
 
                 if resultLine == ".":
                     break
 
                 if resultLine:
                     hadOutput = True
-                    print(f"< {resultLine}")
+                    print("< %s" % resultLine)
 
         if hadOutput:
             print("")
@@ -79,23 +82,22 @@ if __name__ == '__main__':
             print("found %s port on %s" % (port.usb_description(), port.device))
             args.port = port.device
 
-    commander = Commander ()
+    commander = Commander()
 
-    histfile = os.path.join (os.path.expanduser ("~"), ".kaleidoscope-commander.hist")
+    histfile = os.path.join(os.path.expanduser("~"), ".kaleidoscope-commander.hist")
     try:
-        readline.read_history_file (histfile)
+        readline.read_history_file(histfile)
     except IOError:
         pass
-    atexit.register (readline.write_history_file, histfile)
+    atexit.register(readline.write_history_file, histfile)
 
     while True:
         try:
             commander.run()
         except EOFError:
-            sys.exit (0)
-        except Exception as e:
-            print(e)
+            sys.exit(0)
+        except serial.serialutil.SerialException as e:
             print("WARNING: Connection to serial lost, sleeping 10s...")
-            time.sleep (10)
+            time.sleep(10)
             print("WARNING: Sleep over, resuming!")
             pass
